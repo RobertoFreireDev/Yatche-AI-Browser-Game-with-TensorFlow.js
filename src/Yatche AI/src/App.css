@@ -1,0 +1,95 @@
+#dice-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.dice {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border: 2px solid #333;
+  border-radius: 10px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.2s;
+}
+
+.dice.held {
+  background: rgb(101, 101, 114);
+  transform: scale(1.1);
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#scoreboard {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+#scoreboard {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  border-collapse: collapse;
+  width: 350px;
+  background: white;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #333;
+  color: white;
+}
+
+.category {
+  cursor: pointer;
+  background: #f9f9f9;
+  transition: 0.2s;
+}
+
+.category:hover {
+  background: #e0f0ff;
+}
+
+.used {
+  background: #ccc !important;
+  cursor: not-allowed;
+}
+
+.roll-btn {
+  font-size: 48px;   /* make icon bigger */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spin animation */
+@keyframes spinDice {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.roll-btn.spin {
+  animation: spinDice 1s ease-in-out;
+}
