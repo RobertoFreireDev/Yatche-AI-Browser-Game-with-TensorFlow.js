@@ -2,6 +2,7 @@ import * as tf from '@tensorflow/tfjs'
 
 class TensorflowService {
   static instance = null
+  pendingSamples = []
 
   static getInstance() {
     if (!TensorflowService.instance) {
@@ -11,33 +12,48 @@ class TensorflowService {
     return TensorflowService.instance
   }
 
-  async runSimpleDemo() {
+  async trainModel() {
     const model = tf.sequential()
-    model.add(tf.layers.dense({ units: 1, inputShape: [1] }))
 
+    // Input layer
+    // 5 dice values (1,2,3,4,5,6) 
+    // 5 hold dices (0,1) 
+    // 1 rolls left (0,1,2,3) 
+    // 13 chosen categories (0,1) 
+    // Total = 24 inputs
+    model.add(tf.layers.dense({ inputShape: [24], units: 64, activation: 'relu' }))
+
+    // Output layer
+    // 5 hold dices (0,1) 
+    // 1 rolls left (0,1,2,3) 
+    // 13 chosen categories (0,1)
+    // Total = 19 outputs
+    model.add(tf.layers.dense({ units: 19, activation: 'softmax' }))
+    
+
+    // Review this loss function, maybe we should use a custom one to better fit our problem
     model.compile({
-      loss: 'meanSquaredError',
-      optimizer: 'sgd',
+      optimizer: 'adam',
+      loss: 'categoricalCrossentropy',
+      metrics: ['accuracy'],
     })
 
-    const xs = tf.tensor2d([1, 2, 3, 4], [4, 1])
-    const ys = tf.tensor2d([1, 3, 5, 7], [4, 1])
+    await model.fit(
+      tf.tensor2d(this.pendingSamples.map(sample => sample.input)),
+      tf.tensor2d(this.pendingSamples.map(sample => sample.output)),
+      {
+        verbose: 0,
+        epochs: 10,
+        shuffle: true,
+        callbacks: {
+          onEpochEnd: (epoch, logs) => {
+            console.log(`Epoch ${epoch + 1}: loss = ${logs.loss}, accuracy = ${logs.acc}`)
+          },
+        },
+      }
+    )
 
-    await model.fit(xs, ys, { epochs: 100 })
-
-    const predictionInput = tf.tensor2d([5], [1, 1])
-    const predictionTensor = model.predict(predictionInput)
-    predictionTensor.print()
-
-    const prediction = predictionTensor.dataSync()[0]
-
-    xs.dispose()
-    ys.dispose()
-    predictionInput.dispose()
-    predictionTensor.dispose()
-    model.dispose()
-
-    return prediction
+    return model
   }
 }
 
