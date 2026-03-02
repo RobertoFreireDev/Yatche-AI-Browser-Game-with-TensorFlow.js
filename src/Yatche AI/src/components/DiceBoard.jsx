@@ -24,6 +24,7 @@ function DiceBoard({ dice, held, rollsLeft, onToggleHold, onRoll }) {
           🎲
         </button>
         <span
+          className="rolls-left-badge"
           style={{
             position: 'absolute',
             top: '2px',
