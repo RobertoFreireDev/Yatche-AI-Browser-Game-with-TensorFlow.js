@@ -1,28 +1,66 @@
+﻿:root {
+  --felt-dark: #0a4b2a;
+  --felt-mid: #0f6b3a;
+  --felt-light: #1a8a4f;
+  --gold: #d9b45c;
+  --gold-strong: #f2d17a;
+  --ink: #1f1a10;
+  --ivory: #f8f3e8;
+  --table-edge: #3a2412;
+  --chip-red: #c62828;
+}
+
 #dice-container {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin: 20px 0;
+  gap: 16px;
+  margin: 22px auto;
+  padding: 14px;
+  max-width: 720px;
+  border-radius: 16px;
+  border: 3px solid rgba(217, 180, 92, 0.45);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.2), transparent 45%),
+    linear-gradient(145deg, var(--felt-light), var(--felt-mid) 50%, var(--felt-dark));
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.18);
 }
 
 .dice {
-  width: 60px;
-  height: 60px;
-  background: white;
-  border: 2px solid #333;
-  border-radius: 10px;
-  font-size: 24px;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(145deg, #ffffff, #ede8dc);
+  border: 2px solid #b7a47c;
+  border-radius: 12px;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   user-select: none;
-  transition: 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.dice:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
 }
 
 .dice.held {
-  background: rgb(101, 101, 114);
-  transform: scale(1.1);
+  background: linear-gradient(145deg, #fff7df, #f3dca0);
+  border-color: var(--gold-strong);
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 2px rgba(242, 209, 122, 0.4),
+    0 10px 14px rgba(0, 0, 0, 0.3);
 }
 
 button {
@@ -33,60 +71,91 @@ button {
 }
 
 #scoreboard {
-  margin-top: 20px;
-  font-size: 18px;
-}
-
-#scoreboard {
   margin-top: 30px;
   display: flex;
   justify-content: center;
+  font-size: 18px;
 }
 
 table {
   border-collapse: collapse;
-  width: 350px;
-  background: white;
+  width: 380px;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 3px solid var(--table-edge);
+  background: linear-gradient(160deg, #fffef8, #f3ead8);
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
-th, td {
-  border: 1px solid #333;
-  padding: 8px;
+th,
+td {
+  border: 1px solid rgba(58, 36, 18, 0.3);
+  padding: 10px 8px;
   text-align: center;
 }
 
 th {
-  background: #333;
-  color: white;
+  background: linear-gradient(180deg, #4e3118, #2f1e10);
+  color: var(--gold-strong);
+  letter-spacing: 0.4px;
 }
 
 .category {
   cursor: pointer;
-  background: #f9f9f9;
-  transition: 0.2s;
+  background: rgba(255, 255, 255, 0.7);
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .category:hover {
-  background: #e0f0ff;
+  background: #fef1c8;
+}
+
+.category:active {
+  transform: scale(0.99);
 }
 
 .used {
-  background: #ccc !important;
+  background: #ddd3bf !important;
+  color: #5f5340;
   cursor: not-allowed;
 }
 
 .roll-btn {
-  font-size: 48px;   /* make icon bigger */
+  min-width: 64px;
+  height: 64px;
+  padding: 0 14px;
+  border-radius: 50px;
+  border: 2px solid #f3e2b1;
+  background:
+    radial-gradient(circle at 35% 25%, #ff7e7e 0 14%, transparent 15%),
+    radial-gradient(circle at 65% 75%, #9b1111 0 18%, transparent 19%),
+    linear-gradient(145deg, #e93d3d, var(--chip-red));
+  color: #fff6e5;
+  font-size: 34px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow:
+    0 8px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-/* Spin animation */
+.roll-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.roll-btn:active {
+  transform: translateY(0);
+}
+
 @keyframes spinDice {
-  0%   { transform: rotate(0deg) scale(1); }
-  50%  { transform: rotate(180deg) scale(1.2); }
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.15); }
   100% { transform: rotate(360deg) scale(1); }
 }
 
