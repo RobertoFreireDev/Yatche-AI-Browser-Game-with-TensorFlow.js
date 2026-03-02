@@ -79,7 +79,7 @@ button {
 
 table {
   border-collapse: collapse;
-  width: 380px;
+  width: min(92vw, 760px);
   overflow: hidden;
   border-radius: 14px;
   border: 3px solid var(--table-edge);
