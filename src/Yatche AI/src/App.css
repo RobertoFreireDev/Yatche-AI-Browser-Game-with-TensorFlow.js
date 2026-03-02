@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --felt-dark: #0a4b2a;
   --felt-mid: #0f6b3a;
   --felt-light: #1a8a4f;
@@ -8,6 +8,51 @@
   --ivory: #f8f3e8;
   --table-edge: #3a2412;
   --chip-red: #c62828;
+}
+
+.route-nav {
+  display: inline-flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 8px;
+  border-radius: 999px;
+  border: 2px solid rgba(217, 180, 92, 0.4);
+  background: linear-gradient(155deg, rgba(10, 75, 42, 0.9), rgba(7, 45, 25, 0.9));
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.route-link {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 209, 122, 0.35);
+  background: linear-gradient(180deg, #4e3118, #2f1e10);
+  color: #f4e2b6;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+}
+
+.route-link:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  border-color: var(--gold-strong);
+}
+
+.route-link.active {
+  background: linear-gradient(145deg, #fff7df, #f3dca0);
+  color: var(--ink);
+  border-color: var(--gold-strong);
+  box-shadow:
+    0 0 0 2px rgba(242, 209, 122, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.empty-route-page {
+  min-height: 1px;
 }
 
 #dice-container {

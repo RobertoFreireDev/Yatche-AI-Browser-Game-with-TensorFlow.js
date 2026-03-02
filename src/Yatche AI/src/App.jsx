@@ -1,75 +1,70 @@
-﻿import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
-import DiceBoard from './components/DiceBoard'
-import ScoreTable from './components/ScoreTable'
-import { getInitialCategories } from './constants/categories'
-import { calculateCategoryScore, getTotalScore } from './utils/scoring'
+import InferenceTablePage from './pages/InferenceTablePage'
+import TrainingTablePage from './pages/TrainingTablePage'
 
-const MAX_ROLLS = 3
+const DEFAULT_ROUTE = '/training-table'
+
+const ROUTES = {
+  '/training-table': {
+    label: 'Training Table',
+    element: <TrainingTablePage />,
+  },
+  '/inference-table': {
+    label: 'Inference Table',
+    element: <InferenceTablePage />,
+  },
+}
+
+function isValidRoute(pathname) {
+  return pathname in ROUTES
+}
 
 function App() {
-  const [dices, setDices] = useState([0, 0, 0, 0, 0])
-  const [held, setHeld] = useState([false, false, false, false, false])
-  const [rollsLeft, setRollsLeft] = useState(MAX_ROLLS)
-  const [categories, setCategories] = useState(getInitialCategories)
+  const startingPath = isValidRoute(window.location.pathname)
+    ? window.location.pathname
+    : DEFAULT_ROUTE
+  const [currentPath, setCurrentPath] = useState(startingPath)
 
-  const totalScore = useMemo(() => getTotalScore(categories), [categories])
-
-  function toggleHold(index) {
-    if (rollsLeft === 3) return
-
-    setHeld((prev) => {
-      const next = [...prev]
-      next[index] = !next[index]
-      return next
-    })
-  }
-
-  function rollDice() {
-    if (rollsLeft === 0) return
-
-    setDices((prevDice) =>
-      prevDice.map((value, index) =>
-        held[index] ? value : Math.floor(Math.random() * 6) + 1,
-      ),
-    )
-    setRollsLeft((prev) => prev - 1)
-  }
-
-  function scoreCategory(categoryKey) {
-    if (MAX_ROLLS === rollsLeft) return
-
-    if (categories[categoryKey] !== null) return
-
-    const score = calculateCategoryScore(categoryKey, dices)
-    const nextCategories = { ...categories, [categoryKey]: score }
-
-    setCategories(nextCategories)
-    setRollsLeft(3)
-    setHeld([false, false, false, false, false])
-
-    const finished = Object.values(nextCategories).every((value) => value !== null)
-    if (finished) {
-      window.alert(`Game Over! Final Score: ${getTotalScore(nextCategories)}`)
+  useEffect(() => {
+    if (!isValidRoute(window.location.pathname)) {
+      window.history.replaceState({}, '', DEFAULT_ROUTE)
     }
+
+    function handlePopState() {
+      const nextPath = isValidRoute(window.location.pathname)
+        ? window.location.pathname
+        : DEFAULT_ROUTE
+      setCurrentPath(nextPath)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  function navigate(nextPath) {
+    if (nextPath === currentPath) return
+
+    window.history.pushState({}, '', nextPath)
+    setCurrentPath(nextPath)
   }
 
   return (
-    <>
-      <DiceBoard
-        dice={dices}
-        held={held}
-        rollsLeft={rollsLeft}
-        onToggleHold={toggleHold}
-        onRoll={rollDice}
-      />
-      <ScoreTable
-        rollsLeft={rollsLeft}
-        categories={categories}
-        totalScore={totalScore}
-        onScoreCategory={scoreCategory}
-      />
-    </>
+    <main>
+      <nav className="route-nav" aria-label="Model sections">
+        {Object.entries(ROUTES).map(([path, route]) => (
+          <button
+            key={path}
+            type="button"
+            className={`route-link ${currentPath === path ? 'active' : ''}`}
+            onClick={() => navigate(path)}
+          >
+            {route.label}
+          </button>
+        ))}
+      </nav>
+      {ROUTES[currentPath].element}
+    </main>
   )
 }
 
