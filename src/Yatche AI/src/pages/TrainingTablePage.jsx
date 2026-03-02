@@ -11,6 +11,7 @@ function TrainingTablePage() {
   const [held, setHeld] = useState([false, false, false, false, false])
   const [rollsLeft, setRollsLeft] = useState(MAX_ROLLS)
   const [categories, setCategories] = useState(getInitialCategories)
+  const [finalScore, setFinalScore] = useState(null)
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
 
@@ -24,7 +25,20 @@ function TrainingTablePage() {
     })
   }
 
+  function resetGame() {
+    setDices([0, 0, 0, 0, 0])
+    setHeld([false, false, false, false, false])
+    setRollsLeft(MAX_ROLLS)
+    setCategories(getInitialCategories())
+    setFinalScore(null)
+  }
+
   function rollDice() {
+    if (finalScore !== null)
+    {
+      resetGame();
+    }
+
     if (rollsLeft === 0) return
 
     setDices((prevDice) =>
@@ -49,7 +63,7 @@ function TrainingTablePage() {
 
     const finished = Object.values(nextCategories).every((value) => value !== null)
     if (finished) {
-      window.alert(`Game Over! Final Score: ${getTotalScore(nextCategories)}`)
+      setFinalScore(getTotalScore(nextCategories))
     }
   }
 
@@ -68,6 +82,14 @@ function TrainingTablePage() {
         totalScore={totalScore}
         onScoreCategory={scoreCategory}
       />
+      {finalScore !== null && (
+        <div className="final-score-banner" role="status" aria-live="polite">
+          <span className="final-score-chip">♠</span>
+          <span>Game Over</span>
+          <span className="final-score-value">Final Score: {finalScore}</span>
+          <span className="final-score-chip">♣</span>
+        </div>
+      )}
     </>
   )
 }
