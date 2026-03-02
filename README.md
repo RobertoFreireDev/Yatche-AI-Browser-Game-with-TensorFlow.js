@@ -1,235 +1,40 @@
-🎲 Yatche AI – Browser Game with TensorFlow.js
+# 🎲 Yatche AI – Browser-Based Game with TensorFlow.js
 
-A simple Yatche (Yahtzee-like) game built using only:
+A simple **Yatche (Yahtzee-style) dice game** built using only:
 
-✅ HTML
+- HTML  
+- CSS  
+- Vanilla JavaScript  
+- TensorFlow.js (running entirely inside the browser)
 
-✅ CSS
+This project combines game development and machine learning by allowing players to generate training data that is used to train an AI model directly in the browser.
 
-✅ Vanilla JavaScript
+---
 
-✅ TensorFlow.js (running directly in the browser)
+## 🚀 Project Goals
 
-The goal of this project is not only to build a playable dice game, but also to collect gameplay data and train an AI model directly inside the browser.
+1. Create a fully playable Yatche-style dice game using only frontend technologies.
+2. Allow players to play normally while capturing gameplay data.
+3. Train a machine learning model using TensorFlow.js in the browser.
+4. On every turn, allow the AI model to decide:
+   - Roll the dice (if rolls remain)
+   - Score the current dice combination
 
-🚀 Project Goals
+---
 
-Create a fully functional Yatche-style dice game
+## 🧠 AI Concept
 
-Allow human players to play normally
+During gameplay, the system captures:
 
-Capture gameplay decisions as training data
+- Current dice values (5 dice)
+- Rolls remaining (0–2)
+- Available score categories
+- Player decision (roll or score)
+- Selected scoring category
 
-Train a model using TensorFlow.js
+This data is used to train a neural network model directly in the browser.
 
-Let the AI decide actions every turn:
+The trained model receives the current game state and predicts:
 
-🎲 Roll the dice (if rolls remain)
-
-📝 Score the current dice combination
-
-🧠 AI Concept
-
-During gameplay, we collect:
-
-Current dice values
-
-Rolls remaining
-
-Available score categories
-
-Player decision (roll or score)
-
-Selected scoring category
-
-This dataset is used to train a neural network inside the browser using:
-
-👉 @tensorflow/tfjs
-
-The trained model will:
-
-Receive the current game state as input
-
-Predict the best action:
-
-Roll again
-
-Score
-
-Select scoring category
-
-🏗 Architecture
-/index.html
-/style.css
-/game.js
-/ai.js
-/model.js
-🔹 index.html
-
-Game structure and TensorFlow.js script loading.
-
-🔹 style.css
-
-Simple responsive styling.
-
-🔹 game.js
-
-Handles:
-
-Dice rolling
-
-Turn logic
-
-Score calculation
-
-Data capture
-
-🔹 ai.js
-
-Prepares training dataset
-
-Encodes game state
-
-Calls model predictions
-
-🔹 model.js
-
-Defines neural network
-
-Trains model
-
-Saves model to browser storage
-
-Loads model from local storage
-
-🧩 Game Rules (Simplified)
-
-5 dice
-
-Up to 3 rolls per turn
-
-Player chooses scoring category
-
-Standard Yatche combinations:
-
-Ones to Sixes
-
-Three of a kind
-
-Four of a kind
-
-Full House
-
-Small Straight
-
-Large Straight
-
-Yatche
-
-Chance
-
-📊 Training Strategy
-Inputs:
-
-Dice values (5 numbers)
-
-Rolls remaining
-
-Available score categories (binary flags)
-
-Output:
-
-Action:
-
-0 = Roll
-
-1 = Score
-
-(Optional) Score category selection
-
-🤖 Example Model (TensorFlow.js)
-const model = tf.sequential();
-
-model.add(tf.layers.dense({ inputShape: [inputSize], units: 64, activation: 'relu' }));
-model.add(tf.layers.dense({ units: 32, activation: 'relu' }));
-model.add(tf.layers.dense({ units: outputSize, activation: 'softmax' }));
-
-model.compile({
-  optimizer: 'adam',
-  loss: 'categoricalCrossentropy',
-  metrics: ['accuracy']
-});
-🌍 Why Run in the Browser?
-
-Using TensorFlow.js allows:
-
-No backend required
-
-Training directly on player behavior
-
-Model stored locally
-
-Real-time AI improvement
-
-Fully client-side ML
-
-💾 Model Persistence
-
-We use browser storage:
-
-await model.save('localstorage://yatche-model');
-
-To reload:
-
-const model = await tf.loadLayersModel('localstorage://yatche-model');
-🧪 Future Improvements
-
-Reinforcement learning instead of supervised learning
-
-Multiplayer data aggregation
-
-Model visualization
-
-Difficulty levels
-
-Export trained model
-
-▶️ How to Run
-
-Clone the repository
-
-git clone https://github.com/your-username/yatche-ai.git
-
-Open index.html in your browser
-
-Start playing 🎲
-
-Train the AI
-
-Let the AI play!
-
-📚 Technologies Used
-
-HTML5
-
-CSS3
-
-Vanilla JavaScript
-
-TensorFlow.js
-
-🧠 Learning Objectives
-
-This project is perfect for learning:
-
-Game state modeling
-
-Feature engineering
-
-Neural networks in the browser
-
-Supervised learning
-
-AI decision systems
-
-Client-side ML engineering
+- Whether to roll or score
+- (Optionally) Which scoring category to choose
