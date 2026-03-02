@@ -5,10 +5,12 @@ import ScoreTable from './components/ScoreTable'
 import { getInitialCategories } from './constants/categories'
 import { calculateCategoryScore, getTotalScore } from './utils/scoring'
 
+const MAX_ROLLS = 3
+
 function App() {
-  const [dice, setDice] = useState([1, 1, 1, 1, 1])
+  const [dices, setDices] = useState([0, 0, 0, 0, 0])
   const [held, setHeld] = useState([false, false, false, false, false])
-  const [rollsLeft, setRollsLeft] = useState(3)
+  const [rollsLeft, setRollsLeft] = useState(MAX_ROLLS)
   const [categories, setCategories] = useState(getInitialCategories)
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
@@ -26,7 +28,7 @@ function App() {
   function rollDice() {
     if (rollsLeft === 0) return
 
-    setDice((prevDice) =>
+    setDices((prevDice) =>
       prevDice.map((value, index) =>
         held[index] ? value : Math.floor(Math.random() * 6) + 1,
       ),
@@ -35,9 +37,11 @@ function App() {
   }
 
   function scoreCategory(categoryKey) {
+    if (MAX_ROLLS === rollsLeft) return
+
     if (categories[categoryKey] !== null) return
 
-    const score = calculateCategoryScore(categoryKey, dice)
+    const score = calculateCategoryScore(categoryKey, dices)
     const nextCategories = { ...categories, [categoryKey]: score }
 
     setCategories(nextCategories)
@@ -53,13 +57,14 @@ function App() {
   return (
     <>
       <DiceBoard
-        dice={dice}
+        dice={dices}
         held={held}
         rollsLeft={rollsLeft}
         onToggleHold={toggleHold}
         onRoll={rollDice}
       />
       <ScoreTable
+        rollsLeft={rollsLeft}
         categories={categories}
         totalScore={totalScore}
         onScoreCategory={scoreCategory}
