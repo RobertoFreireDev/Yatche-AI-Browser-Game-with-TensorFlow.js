@@ -27,10 +27,6 @@ function TrainingTablePage() {
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
 
-  function mapHeldFlags(values) {
-    return values.map((value) => (value ? 1 : 0))
-  }
-
   function mapChosenCategoryFlags(categoryValues) {
     return categoryKeys.map((key) => (categoryValues[key] !== null ? 1 : 0))
   }
@@ -38,8 +34,6 @@ function TrainingTablePage() {
   function buildModelInput() {
     return [
       ...dices,
-      ...mapHeldFlags(held),
-      rollsLeft,
       ...mapChosenCategoryFlags(categories),
     ]
   }
@@ -47,21 +41,12 @@ function TrainingTablePage() {
   function normalizeInput(input) {
     return input.map((value, index) => {
       if (index < 5) return value / 6
-      if (index === 10) return value / MAX_ROLLS
       return Math.max(0, Math.min(1, value))
     })
   }
 
-  function normalizeOutput(output) {
-    return output.map((value, index) => {
-      if (index === 5) return value / MAX_ROLLS
-      return Math.max(0, Math.min(1, value))
-    })
-  }
-
-  function pushPendingSample(output) {
+  function pushPendingSample(normalizedOutput) {
     const normalizedInput = normalizeInput(buildModelInput())
-    const normalizedOutput = normalizeOutput(output)
     tensorflowService.addPendingSample({
       input: normalizedInput,
       output: normalizedOutput,
@@ -108,11 +93,6 @@ function TrainingTablePage() {
     setHeld((prev) => {
       const next = [...prev]
       next[index] = !next[index]
-      pushPendingSample([
-        ...mapHeldFlags(next),
-        rollsLeft,
-        ...new Array(categoryKeys.length).fill(0),
-      ])
       return next
     })
   }
@@ -132,12 +112,6 @@ function TrainingTablePage() {
 
     if (rollsLeft === 0) return
 
-    pushPendingSample([
-      ...mapHeldFlags(held),
-      Math.max(rollsLeft - 1, 0),
-      ...new Array(categoryKeys.length).fill(0),
-    ])
-
     setDices((prevDice) =>
       prevDice.map((value, index) =>
         held[index] ? value : Math.floor(Math.random() * 6) + 1,
@@ -151,11 +125,7 @@ function TrainingTablePage() {
 
     if (categories[categoryKey] !== null) return
 
-    pushPendingSample([
-      0, 0, 0, 0, 0,
-      MAX_ROLLS,
-      ...categoryKeys.map((key) => (key === categoryKey ? 1 : 0)),
-    ])
+    pushPendingSample([...categoryKeys.map((key) => (key === categoryKey ? 1 : 0))])
 
     const score = calculateCategoryScore(categoryKey, dices)
     const nextCategories = { ...categories, [categoryKey]: score }
@@ -225,11 +195,6 @@ function TrainingTablePage() {
             <p>{predictionError}</p>
           ) : (
             <>
-              <p>
-                Keep dice:{' '}
-                {prediction.holdDice.map((value, index) => `D${index + 1} ${value ? 'hold' : 'roll'}`).join(', ')}
-              </p>
-              <p>Suggested rolls left target: {prediction.rollsLeft}</p>
               <p>Suggested category: {suggestedCategoryLabel ?? 'Unknown'}</p>
             </>
           )}

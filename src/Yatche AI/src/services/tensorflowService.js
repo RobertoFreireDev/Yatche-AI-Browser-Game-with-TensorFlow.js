@@ -25,20 +25,15 @@ class TensorflowService {
 
     // Input layer
     // 5 dice values (1,2,3,4,5,6)
-    // 5 hold dices (0,1)
-    // 1 rolls left (0,1,2,3)
     // 13 chosen categories (0,1)
-    // Total = 24 inputs
-    model.add(tf.layers.dense({ inputShape: [24], units: 64, activation: 'relu' }))
+    // Total = 18 inputs
+    model.add(tf.layers.dense({ inputShape: [18], units: 64, activation: 'relu' }))
 
     // Output layer
-    // 5 hold dices (0,1)
-    // 1 rolls left (0,1,2,3)
-    // 13 chosen categories (0,1)
-    // Total = 19 outputs
-    model.add(tf.layers.dense({ units: 19, activation: 'softmax' }))
+    // 13 categories (0,1)
+    // Total = 13 outputs
+    model.add(tf.layers.dense({ units: 13, activation: 'softmax' }))
 
-    // Review this loss function, maybe we should use a custom one to better fit our problem
     model.compile({
       optimizer: 'adam',
       loss: 'categoricalCrossentropy',
@@ -111,8 +106,8 @@ class TensorflowService {
       }
     }
 
-    if (!Array.isArray(input) || input.length !== 24) {
-      throw new Error('predict() expects an input array with 24 values.')
+    if (!Array.isArray(input) || input.length !== 18) {
+      throw new Error('predict() expects an input array with 18 values.')
     }
 
     const inputTensor = tf.tensor2d([input])
@@ -122,21 +117,13 @@ class TensorflowService {
     inputTensor.dispose()
     predictionTensor.dispose()
 
-    const holdScores = output.slice(0, 5)
-    const rollsLeftScore = output[5]
-    const categoryScores = output.slice(6, 19)
+    const categoryScores = output.slice(0, 13)
 
-    const suggestedHold = holdScores.map((score) => (score >= 0.5 ? 1 : 0))
-    const suggestedRollsLeft = Math.max(0, Math.min(3, Math.round(rollsLeftScore * 3)))
     const suggestedCategoryIndex = categoryScores.indexOf(Math.max(...categoryScores))
 
     return {
-      holdDice: suggestedHold,
-      rollsLeft: suggestedRollsLeft,
       categoryIndex: suggestedCategoryIndex,
       scores: {
-        holdDice: holdScores,
-        rollsLeft: rollsLeftScore,
         categories: categoryScores,
       },
       rawOutput: output,
