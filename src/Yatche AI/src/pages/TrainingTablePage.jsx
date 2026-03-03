@@ -121,7 +121,7 @@ function TrainingTablePage() {
       const stamp = new Date().toISOString().replace(/[:.]/g, '-')
 
       anchor.href = url
-      anchor.download = `yatche-ai-pending-samples-${stamp}.json`
+      anchor.download = `yacht-ai-pending-samples-${stamp}.json`
       document.body.appendChild(anchor)
       anchor.click()
       anchor.remove()

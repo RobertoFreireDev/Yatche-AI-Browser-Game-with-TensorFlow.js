@@ -43,7 +43,7 @@ export function calculateCategoryScore(category, dice) {
       return hasStraight(unique, 4) ? 30 : 0
     case 'largeStraight':
       return hasStraight(unique, 5) ? 40 : 0
-    case 'yatche':
+    case 'yacht':
       return values.includes(5) ? 50 : 0
     case 'chance':
       return sum

@@ -10,7 +10,7 @@
   ['Full House', 'fullHouse'],
   ['Small Straight', 'smallStraight'],
   ['Large Straight', 'largeStraight'],
-  ['Yatche', 'yatche'],
+  ['Yacht', 'yacht'],
   ['Chance', 'chance'],
 ]
 
@@ -27,7 +27,7 @@ export function getInitialCategories() {
     fullHouse: null,
     smallStraight: null,
     largeStraight: null,
-    yatche: null,
+    yacht: null,
     chance: null,
   }
 }

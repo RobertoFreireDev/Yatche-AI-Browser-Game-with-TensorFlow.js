@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs'
 
-const MODEL_STORAGE_KEY = 'yatche-ai-model'
-const PENDING_SAMPLES_STORAGE_KEY = 'yatche-ai-pending-samples'
+const MODEL_STORAGE_KEY = 'yacht-ai-model'
+const PENDING_SAMPLES_STORAGE_KEY = 'yacht-ai-pending-samples'
 
 class TensorflowService {
   static instance = null
