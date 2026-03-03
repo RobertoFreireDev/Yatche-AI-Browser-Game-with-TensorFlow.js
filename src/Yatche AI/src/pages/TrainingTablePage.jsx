@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import DiceBoard from '../components/DiceBoard'
 import ScoreTable from '../components/ScoreTable'
 import { CATEGORY_ROWS, getInitialCategories } from '../constants/categories'
@@ -6,6 +6,15 @@ import tensorflowService from '../services/tensorflowService'
 import { calculateCategoryScore, getTotalScore } from '../utils/scoring'
 
 const MAX_ROLLS = 3
+const TRAINING_SUCCESS_MESSAGE = 'AI model trained and saved in local storage.'
+
+function shouldAutoDismissStorageMessage(message) {
+  return (
+    message.startsWith('Downloaded ') && message.endsWith(' pending samples.')
+  ) || (
+    message.startsWith('Imported ') && message.endsWith(' pending samples.')
+  )
+}
 
 function TrainingTablePage() {
   const [dices, setDices] = useState([0, 0, 0, 0, 0])
@@ -31,6 +40,30 @@ function TrainingTablePage() {
   )
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
+
+  useEffect(() => {
+    if (trainingMessage !== TRAINING_SUCCESS_MESSAGE) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setTrainingMessage('')
+    }, 3000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [trainingMessage])
+
+  useEffect(() => {
+    if (!shouldAutoDismissStorageMessage(storageMessage)) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setStorageMessage('')
+    }, 3000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [storageMessage])
 
   function mapChosenCategoryFlags(categoryValues) {
     return categoryKeys.map((key) => (categoryValues[key] !== null ? 0 : 1))
@@ -98,7 +131,7 @@ function TrainingTablePage() {
     try {
       await tensorflowService.trainModel()
       await tensorflowService.saveModelToStorage()
-      setTrainingMessage('AI model trained and saved in local storage.')
+      setTrainingMessage(TRAINING_SUCCESS_MESSAGE)
     } catch (error) {
       setTrainingMessage(error instanceof Error ? error.message : 'Could not train AI model.')
     } finally {
