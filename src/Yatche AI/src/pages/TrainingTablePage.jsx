@@ -17,6 +17,8 @@ function TrainingTablePage() {
   const [predictionError, setPredictionError] = useState('')
   const [isPredicting, setIsPredicting] = useState(false)
   const [showPrediction, setShowPrediction] = useState(false)
+  const [feedbackCategoryKey, setFeedbackCategoryKey] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
   const [isTraining, setIsTraining] = useState(false)
   const [trainingMessage, setTrainingMessage] = useState('')
   const categoryKeys = useMemo(() => Object.keys(getInitialCategories()), [])
@@ -53,9 +55,23 @@ function TrainingTablePage() {
     })
   }
 
+  function addSuggestionFeedbackSample() {
+    const selectedCategoryKey = feedbackCategoryKey
+    if (!selectedCategoryKey || categories[selectedCategoryKey] !== null) {
+      setFeedbackMessage('Please select an available category.')
+      return
+    }
+
+    pushPendingSample([...categoryKeys.map((key) => (key === selectedCategoryKey ? 1 : 0))])
+    setFeedbackMessage(`Added sample for ${categoryLabelsByKey[selectedCategoryKey]}.`)
+    setShowPrediction(false)
+  }
+
   async function showModelSuggestion() {
     setIsPredicting(true)
     setPredictionError('')
+    setFeedbackCategoryKey('')
+    setFeedbackMessage('')
 
     try {
       const normalizedInput = normalizeInput(buildModelInput())
@@ -145,6 +161,7 @@ function TrainingTablePage() {
   const suggestedCategoryLabel = suggestedCategoryKey
     ? categoryLabelsByKey[suggestedCategoryKey]
     : null
+  const availableCategoryKeys = categoryKeys.filter((key) => categories[key] === null)
 
   return (
     <>
@@ -196,6 +213,36 @@ function TrainingTablePage() {
           ) : (
             <>
               <p>Suggested category: {suggestedCategoryLabel ?? 'Unknown'}</p>
+              <div className="suggestion-feedback-controls">
+                <label className="suggestion-feedback-label" htmlFor="suggestion-category-select">
+                  Add training sample:
+                </label>
+                <select
+                  className="suggestion-select"
+                  id="suggestion-category-select"
+                  value={feedbackCategoryKey}
+                  onChange={(event) => {
+                    setFeedbackCategoryKey(event.target.value)
+                    setFeedbackMessage('')
+                  }}
+                >
+                  <option value="">Select a category</option>
+                  {availableCategoryKeys.map((key) => (
+                    <option key={key} value={key}>
+                      {categoryLabelsByKey[key]}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="suggestion-add-btn"
+                  onClick={addSuggestionFeedbackSample}
+                  disabled={feedbackCategoryKey === ''}
+                >
+                  Add sample
+                </button>
+              </div>
+              {feedbackMessage && <p>{feedbackMessage}</p>}
             </>
           )}
         </aside>

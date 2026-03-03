@@ -1,6 +1,8 @@
 ﻿import Dice from './Dice'
 
 function DiceBoard({ dice, held, rollsLeft, onToggleHold, onRoll }) {
+  const isRollDisabled = rollsLeft === 0
+
   return (
     <div id="dice-container">
       {dice.map((value, index) => (
@@ -15,27 +17,14 @@ function DiceBoard({ dice, held, rollsLeft, onToggleHold, onRoll }) {
       <div style={{ position: 'relative', display: 'inline-block' }}>
         <button
           type="button"
-          className="roll-btn"
+          className={`roll-btn${isRollDisabled ? ' disabled' : ''}`}
           onClick={onRoll}
           title="Roll dice"
-          disabled={rollsLeft === 0}
-          style={rollsLeft === 0 ? { background: '#8f8f8f', cursor: 'not-allowed' } : {}}
+          disabled={isRollDisabled}
         >
           🎲
         </button>
-        <span
-          className="rolls-left-badge"
-          style={{
-            position: 'absolute',
-            top: '2px',
-            right: '4px',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: '22px',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.7)',
-            pointerEvents: 'none',
-          }}
-        >
+        <span className="rolls-left-badge">
           {rollsLeft}
         </span>
       </div>
