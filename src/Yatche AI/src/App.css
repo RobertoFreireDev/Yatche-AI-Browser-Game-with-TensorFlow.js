@@ -309,7 +309,7 @@ th {
 .train-btn:disabled,
 .suggestion-btn:disabled {
   opacity: 0.75;
-  cursor: wait;
+  cursor: not-allowed;
 }
 
 .suggestion-panel {

@@ -184,7 +184,7 @@ function TrainingTablePage() {
           type="button"
           className="suggestion-btn"
           onClick={showModelSuggestion}
-          disabled={isPredicting || isTraining}
+          disabled={isPredicting || isTraining || rollsLeft === MAX_ROLLS}
         >
           {isPredicting ? 'Thinking...' : 'What should I do?'}
         </button>
