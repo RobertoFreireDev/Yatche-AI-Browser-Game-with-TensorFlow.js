@@ -220,6 +220,8 @@ function TrainingTablePage() {
   }
 
   function rollDice() {
+    setShowPrediction(false)
+    
     if (finalScore !== null) {
       resetGame()
     }

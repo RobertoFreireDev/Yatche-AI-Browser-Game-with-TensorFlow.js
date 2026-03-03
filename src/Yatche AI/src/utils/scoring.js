@@ -34,13 +34,13 @@ export function calculateCategoryScore(category, dice) {
       return dice.filter((d) => d === face).reduce((acc, current) => acc + current, 0)
     }
     case 'threeKind':
-      return values.includes(3) ? sum : 0
+      return values.some((count) => count >= 3) ? sum : 0
     case 'fourKind':
       return values.includes(4) ? sum : 0
     case 'fullHouse':
       return values.includes(3) && values.includes(2) ? 25 : 0
     case 'smallStraight':
-      return hasStraight(unique, 4) ? 30 : 0
+      return hasStraight(unique, 4) || hasStraight(unique, 5) ? 30 : 0
     case 'largeStraight':
       return hasStraight(unique, 5) ? 40 : 0
     case 'yacht':
