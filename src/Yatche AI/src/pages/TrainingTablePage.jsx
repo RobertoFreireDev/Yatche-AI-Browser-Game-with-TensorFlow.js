@@ -108,6 +108,11 @@ function TrainingTablePage() {
     setHeld((prev) => {
       const next = [...prev]
       next[index] = !next[index]
+      pushPendingSample([
+        ...mapHeldFlags(next),
+        rollsLeft,
+        ...new Array(categoryKeys.length).fill(0),
+      ])
       return next
     })
   }
