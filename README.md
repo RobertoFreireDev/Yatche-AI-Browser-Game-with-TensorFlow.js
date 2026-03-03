@@ -5,5 +5,4 @@ A simple **Yatche (Yahtzee-style) dice game** built using only:
 - React
 - TensorFlow.js (running entirely inside the browser)
 
-
-![alt text](game.png)
+![alt text](image.png)
