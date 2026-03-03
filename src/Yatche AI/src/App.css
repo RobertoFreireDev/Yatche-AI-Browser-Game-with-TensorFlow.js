@@ -407,6 +407,17 @@ th {
   outline-offset: 2px;
 }
 
+.suggestion-select option {
+  background: #f3ead8;
+  color: #2f1e10;
+  font-weight: 700;
+}
+
+.suggestion-select option:checked {
+  background: #4e3118;
+  color: #f4e2b6;
+}
+
 .suggestion-add-btn {
   padding: 8px 12px;
   border-radius: 999px;
