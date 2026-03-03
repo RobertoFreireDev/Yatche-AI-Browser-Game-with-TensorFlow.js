@@ -17,6 +17,8 @@ function TrainingTablePage() {
   const [predictionError, setPredictionError] = useState('')
   const [isPredicting, setIsPredicting] = useState(false)
   const [showPrediction, setShowPrediction] = useState(false)
+  const [isTraining, setIsTraining] = useState(false)
+  const [trainingMessage, setTrainingMessage] = useState('')
   const categoryKeys = useMemo(() => Object.keys(getInitialCategories()), [])
   const categoryLabelsByKey = useMemo(
     () => Object.fromEntries(CATEGORY_ROWS.map(([label, key]) => [key, label])),
@@ -81,6 +83,22 @@ function TrainingTablePage() {
       setPredictionError(error instanceof Error ? error.message : 'Could not get suggestion.')
     } finally {
       setIsPredicting(false)
+    }
+  }
+
+  async function trainAiModel() {
+    setIsTraining(true)
+    setTrainingMessage('')
+    setPredictionError('')
+
+    try {
+      await tensorflowService.trainModel()
+      await tensorflowService.saveModelToStorage()
+      setTrainingMessage('AI model trained and saved in local storage.')
+    } catch (error) {
+      setTrainingMessage(error instanceof Error ? error.message : 'Could not train AI model.')
+    } finally {
+      setIsTraining(false)
     }
   }
 
@@ -176,14 +194,24 @@ function TrainingTablePage() {
           <span className="final-score-chip">&clubs;</span>
         </div>
       )}
-      <button
-        type="button"
-        className="suggestion-btn"
-        onClick={showModelSuggestion}
-        disabled={isPredicting}
-      >
-        {isPredicting ? 'Thinking...' : 'What should I do?'}
-      </button>
+      <div className="floating-actions">
+        <button
+          type="button"
+          className="train-btn"
+          onClick={trainAiModel}
+          disabled={isTraining || isPredicting}
+        >
+          {isTraining ? 'Training...' : 'Train AI'}
+        </button>
+        <button
+          type="button"
+          className="suggestion-btn"
+          onClick={showModelSuggestion}
+          disabled={isPredicting || isTraining}
+        >
+          {isPredicting ? 'Thinking...' : 'What should I do?'}
+        </button>
+      </div>
       {showPrediction && (
         <aside className="suggestion-panel" aria-live="polite">
           {predictionError ? (
@@ -198,6 +226,11 @@ function TrainingTablePage() {
               <p>Suggested category: {suggestedCategoryLabel ?? 'Unknown'}</p>
             </>
           )}
+        </aside>
+      )}
+      {trainingMessage && (
+        <aside className="training-panel" aria-live="polite">
+          <p>{trainingMessage}</p>
         </aside>
       )}
     </>

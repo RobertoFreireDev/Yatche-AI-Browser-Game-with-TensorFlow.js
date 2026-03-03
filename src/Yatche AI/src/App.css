@@ -268,15 +268,20 @@ th {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
 }
 
-.suggestion-btn {
+.floating-actions {
   position: fixed;
   right: 20px;
   bottom: 20px;
+  display: flex;
+  gap: 10px;
   z-index: 1000;
+}
+
+.train-btn,
+.suggestion-btn {
   padding: 10px 14px;
   border-radius: 999px;
   border: 2px solid #f3e2b1;
-  background: linear-gradient(145deg, #fff7df, #f3dca0);
   color: #2f1e10;
   font-size: 14px;
   font-weight: 700;
@@ -285,6 +290,15 @@ th {
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
+.train-btn {
+  background: linear-gradient(145deg, #d2f3d8, #9fd8aa);
+}
+
+.suggestion-btn {
+  background: linear-gradient(145deg, #fff7df, #f3dca0);
+}
+
+.train-btn:disabled,
 .suggestion-btn:disabled {
   opacity: 0.75;
   cursor: wait;
@@ -306,6 +320,26 @@ th {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+.training-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 78px;
+  z-index: 998;
+  width: min(90vw, 320px);
+  border-radius: 12px;
+  border: 2px solid rgba(159, 216, 170, 0.8);
+  padding: 12px;
+  background: linear-gradient(155deg, rgba(16, 78, 37, 0.95), rgba(11, 57, 30, 0.95));
+  color: #e8fff0;
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.training-panel p {
+  margin: 0;
+}
+
 .suggestion-panel p {
   margin: 0;
 }
@@ -315,12 +349,18 @@ th {
 }
 
 @media (max-width: 640px) {
-  .suggestion-btn {
+  .floating-actions {
     right: 12px;
     bottom: 12px;
   }
 
   .suggestion-panel {
+    right: 12px;
+    bottom: 68px;
+    width: min(94vw, 320px);
+  }
+
+  .training-panel {
     right: 12px;
     bottom: 68px;
     width: min(94vw, 320px);
