@@ -277,6 +277,14 @@ th {
   z-index: 1000;
 }
 
+.floating-actions-left {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  z-index: 1000;
+}
+
 .train-btn,
 .suggestion-btn {
   padding: 10px 14px;
@@ -322,7 +330,7 @@ th {
 
 .training-panel {
   position: fixed;
-  right: 20px;
+  left: 20px;
   bottom: 78px;
   z-index: 998;
   width: min(90vw, 320px);
@@ -354,6 +362,11 @@ th {
     bottom: 12px;
   }
 
+  .floating-actions-left {
+    left: 12px;
+    bottom: 12px;
+  }
+
   .suggestion-panel {
     right: 12px;
     bottom: 68px;
@@ -361,7 +374,7 @@ th {
   }
 
   .training-panel {
-    right: 12px;
+    left: 12px;
     bottom: 68px;
     width: min(94vw, 320px);
   }

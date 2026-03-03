@@ -199,7 +199,7 @@ function TrainingTablePage() {
           <span className="final-score-chip">&clubs;</span>
         </div>
       )}
-      <div className="floating-actions">
+      <div className="floating-actions-left">
         <button
           type="button"
           className="train-btn"
@@ -208,6 +208,8 @@ function TrainingTablePage() {
         >
           {isTraining ? 'Training...' : 'Train AI'}
         </button>
+      </div>
+      <div className="floating-actions">
         <button
           type="button"
           className="suggestion-btn"
