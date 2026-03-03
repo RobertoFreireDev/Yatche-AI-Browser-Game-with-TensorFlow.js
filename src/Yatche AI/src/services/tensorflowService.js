@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs'
 
 const MODEL_STORAGE_KEY = 'yatche-ai-model'
+const PENDING_SAMPLES_STORAGE_KEY = 'yatche-ai-pending-samples'
 
 class TensorflowService {
   static instance = null
@@ -47,6 +48,8 @@ class TensorflowService {
     if (this.model) return true
     if (this.initializationPromise) return this.initializationPromise
 
+    this.loadPendingSamplesFromStorage()
+
     this.initializationPromise = this.loadModelFromStorage()
       .finally(() => {
         this.initializationPromise = null
@@ -75,6 +78,26 @@ class TensorflowService {
     await this.model.save(`localstorage://${MODEL_STORAGE_KEY}`)
   }
 
+  loadPendingSamplesFromStorage() {
+    const rawPendingSamples = localStorage.getItem(PENDING_SAMPLES_STORAGE_KEY)
+
+    if (!rawPendingSamples) {
+      this.pendingSamples = []
+      return
+    }
+
+    try {
+      const parsedPendingSamples = JSON.parse(rawPendingSamples)
+      this.pendingSamples = Array.isArray(parsedPendingSamples) ? parsedPendingSamples : []
+    } catch {
+      this.pendingSamples = []
+    }
+  }
+
+  savePendingSamplesToStorage() {
+    localStorage.setItem(PENDING_SAMPLES_STORAGE_KEY, JSON.stringify(this.pendingSamples))
+  }
+
   async trainModel() {
     if (this.pendingSamples.length === 0) {
       throw new Error('No training samples available yet. Play and score first to collect samples.')
@@ -96,6 +119,8 @@ class TensorflowService {
         },
       }
     )
+
+    this.savePendingSamplesToStorage()
   }
 
   async predict(input) {
