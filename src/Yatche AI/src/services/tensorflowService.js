@@ -110,11 +110,11 @@ class TensorflowService {
       tf.tensor2d(this.pendingSamples.map((sample) => sample.output)),
       {
         verbose: 0,
-        epochs: 10,
+        epochs: 120,
         shuffle: true,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            console.log(`Epoch ${epoch + 1}: loss = ${logs.loss}, accuracy = ${logs.accuracy}`)
+            console.log(`Epoch ${epoch + 1}: loss = ${logs.loss}, accuracy = ${logs.acc}`)
           },
         },
       }
