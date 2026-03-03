@@ -2,9 +2,7 @@
 
 A simple **Yatche (Yahtzee-style) dice game** built using only:
 
-- HTML  
-- CSS  
-- Vanilla JavaScript  
+- React
 - TensorFlow.js (running entirely inside the browser)
 
 
