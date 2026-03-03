@@ -25,12 +25,12 @@ class TensorflowService {
 
     // Input layer
     // 5 dice values (1,2,3,4,5,6)
-    // 13 chosen categories (0,1)
+    // 13 available categories (0 -> unavailable,1 -> available)
     // Total = 18 inputs
-    model.add(tf.layers.dense({ inputShape: [18], units: 64, activation: 'relu' }))
+    model.add(tf.layers.dense({ inputShape: [18], units: 128, activation: 'relu' }))
 
     // Output layer
-    // 13 categories (0,1)
+    // 13 categories (0-> don't chose,1 -> chose)
     // Total = 13 outputs
     model.add(tf.layers.dense({ units: 13, activation: 'softmax' }))
 

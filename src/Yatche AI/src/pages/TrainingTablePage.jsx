@@ -28,7 +28,7 @@ function TrainingTablePage() {
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
 
   function mapChosenCategoryFlags(categoryValues) {
-    return categoryKeys.map((key) => (categoryValues[key] !== null ? 1 : 0))
+    return categoryKeys.map((key) => (categoryValues[key] !== null ? 0 : 1))
   }
 
   function buildModelInput() {
