@@ -60,9 +60,7 @@ class TensorflowService {
   }
 
   async predict(input) {
-    if (!this.model) {
-      throw new Error('Model is not trained yet. Call trainModel() before predict().')
-    }
+    await this.trainModel()
 
     if (!Array.isArray(input) || input.length !== 24) {
       throw new Error('predict() expects an input array with 24 values.')

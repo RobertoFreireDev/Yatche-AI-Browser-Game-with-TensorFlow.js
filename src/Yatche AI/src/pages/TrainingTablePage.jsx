@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import DiceBoard from '../components/DiceBoard'
 import ScoreTable from '../components/ScoreTable'
-import { getInitialCategories } from '../constants/categories'
+import { CATEGORY_ROWS, getInitialCategories } from '../constants/categories'
 import tensorflowService from '../services/tensorflowService'
 import { calculateCategoryScore, getTotalScore } from '../utils/scoring'
 
@@ -13,7 +13,15 @@ function TrainingTablePage() {
   const [rollsLeft, setRollsLeft] = useState(MAX_ROLLS)
   const [categories, setCategories] = useState(getInitialCategories)
   const [finalScore, setFinalScore] = useState(null)
+  const [prediction, setPrediction] = useState(null)
+  const [predictionError, setPredictionError] = useState('')
+  const [isPredicting, setIsPredicting] = useState(false)
+  const [showPrediction, setShowPrediction] = useState(false)
   const categoryKeys = useMemo(() => Object.keys(getInitialCategories()), [])
+  const categoryLabelsByKey = useMemo(
+    () => Object.fromEntries(CATEGORY_ROWS.map(([label, key]) => [key, label])),
+    [],
+  )
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
 
@@ -58,6 +66,24 @@ function TrainingTablePage() {
     })
   }
 
+  async function showModelSuggestion() {
+    setIsPredicting(true)
+    setPredictionError('')
+
+    try {
+      const normalizedInput = normalizeInput(buildModelInput())
+      const result = await tensorflowService.predict(normalizedInput)
+      setPrediction(result)
+      setShowPrediction(true)
+    } catch (error) {
+      setPrediction(null)
+      setShowPrediction(true)
+      setPredictionError(error instanceof Error ? error.message : 'Could not get suggestion.')
+    } finally {
+      setIsPredicting(false)
+    }
+  }
+
   function toggleHold(index) {
     if (rollsLeft === MAX_ROLLS) return
 
@@ -77,9 +103,8 @@ function TrainingTablePage() {
   }
 
   function rollDice() {
-    if (finalScore !== null)
-    {
-      resetGame();
+    if (finalScore !== null) {
+      resetGame()
     }
 
     if (rollsLeft === 0) return
@@ -122,6 +147,12 @@ function TrainingTablePage() {
     }
   }
 
+  const suggestedCategoryKey =
+    prediction && prediction.categoryIndex >= 0 ? categoryKeys[prediction.categoryIndex] : null
+  const suggestedCategoryLabel = suggestedCategoryKey
+    ? categoryLabelsByKey[suggestedCategoryKey]
+    : null
+
   return (
     <>
       <DiceBoard
@@ -139,11 +170,35 @@ function TrainingTablePage() {
       />
       {finalScore !== null && (
         <div className="final-score-banner" role="status" aria-live="polite">
-          <span className="final-score-chip">♠</span>
+          <span className="final-score-chip">&spades;</span>
           <span>Game Over</span>
           <span className="final-score-value">Final Score: {finalScore}</span>
-          <span className="final-score-chip">♣</span>
+          <span className="final-score-chip">&clubs;</span>
         </div>
+      )}
+      <button
+        type="button"
+        className="suggestion-btn"
+        onClick={showModelSuggestion}
+        disabled={isPredicting}
+      >
+        {isPredicting ? 'Thinking...' : 'What should I do?'}
+      </button>
+      {showPrediction && (
+        <aside className="suggestion-panel" aria-live="polite">
+          {predictionError ? (
+            <p>{predictionError}</p>
+          ) : (
+            <>
+              <p>
+                Keep dice:{' '}
+                {prediction.holdDice.map((value, index) => `D${index + 1} ${value ? 'hold' : 'roll'}`).join(', ')}
+              </p>
+              <p>Suggested rolls left target: {prediction.rollsLeft}</p>
+              <p>Suggested category: {suggestedCategoryLabel ?? 'Unknown'}</p>
+            </>
+          )}
+        </aside>
       )}
     </>
   )
