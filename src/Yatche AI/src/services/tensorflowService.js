@@ -21,6 +21,21 @@ class TensorflowService {
     this.pendingSamples.push(sample)
   }
 
+  getPendingSamplesSnapshot() {
+    this.loadPendingSamplesFromStorage()
+    return [...this.pendingSamples]
+  }
+
+  importPendingSamples(samples) {
+    if (!Array.isArray(samples)) {
+      throw new Error('Invalid samples file. Expected an array.')
+    }
+
+    this.pendingSamples = samples
+    this.savePendingSamplesToStorage()
+    return this.pendingSamples.length
+  }
+
   createModel() {
     const model = tf.sequential()
 

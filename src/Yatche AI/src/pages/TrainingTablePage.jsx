@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DiceBoard from '../components/DiceBoard'
 import ScoreTable from '../components/ScoreTable'
 import { CATEGORY_ROWS, getInitialCategories } from '../constants/categories'
@@ -21,6 +21,9 @@ function TrainingTablePage() {
   const [feedbackMessage, setFeedbackMessage] = useState('')
   const [isTraining, setIsTraining] = useState(false)
   const [trainingMessage, setTrainingMessage] = useState('')
+  const [storageMessage, setStorageMessage] = useState('')
+  const [storageMessageType, setStorageMessageType] = useState('info')
+  const importInputRef = useRef(null)
   const categoryKeys = useMemo(() => Object.keys(getInitialCategories()), [])
   const categoryLabelsByKey = useMemo(
     () => Object.fromEntries(CATEGORY_ROWS.map(([label, key]) => [key, label])),
@@ -101,6 +104,68 @@ function TrainingTablePage() {
     } finally {
       setIsTraining(false)
     }
+  }
+
+  function setStorageFeedback(message, type = 'info') {
+    setStorageMessage(message)
+    setStorageMessageType(type)
+  }
+
+  function downloadPendingSamples() {
+    try {
+      const pendingSamples = tensorflowService.getPendingSamplesSnapshot()
+      const payload = JSON.stringify(pendingSamples, null, 2)
+      const blob = new Blob([payload], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+
+      anchor.href = url
+      anchor.download = `yatche-ai-pending-samples-${stamp}.json`
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+      setStorageFeedback(`Downloaded ${pendingSamples.length} pending samples.`, 'success')
+    } catch (error) {
+      setStorageFeedback(
+        error instanceof Error ? error.message : 'Could not download pending samples.',
+        'error',
+      )
+    }
+  }
+
+  function openImportDialog() {
+    importInputRef.current?.click()
+  }
+
+  function handleImportPendingSamples(event) {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result))
+        const count = tensorflowService.importPendingSamples(parsed)
+        setStorageFeedback(`Imported ${count} pending samples.`, 'success')
+      } catch (error) {
+        setStorageFeedback(
+          error instanceof Error ? error.message : 'Could not import pending samples.',
+          'error',
+        )
+      } finally {
+        event.target.value = ''
+      }
+    }
+    reader.onerror = () => {
+      setStorageFeedback('Could not read selected file.', 'error')
+      event.target.value = ''
+    }
+    reader.readAsText(file)
   }
 
   function toggleHold(index) {
@@ -206,6 +271,38 @@ function TrainingTablePage() {
           {isPredicting ? 'Thinking...' : 'What should I do?'}
         </button>
       </div>
+      <div className="storage-actions-top-right">
+        <button
+          type="button"
+          className="storage-icon-btn"
+          onClick={downloadPendingSamples}
+          title="Download pending samples"
+          aria-label="Download pending samples"
+        >
+          ⤓
+        </button>
+        <button
+          type="button"
+          className="storage-icon-btn"
+          onClick={openImportDialog}
+          title="Upload pending samples"
+          aria-label="Upload pending samples"
+        >
+          ⤒
+        </button>
+        <input
+          ref={importInputRef}
+          className="storage-file-input"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportPendingSamples}
+        />
+      </div>
+      {storageMessage && (
+        <aside className={`storage-panel ${storageMessageType}`} aria-live="polite">
+          <p>{storageMessage}</p>
+        </aside>
+      )}
       {showPrediction && (
         <aside className="suggestion-panel" aria-live="polite">
           {predictionError ? (
