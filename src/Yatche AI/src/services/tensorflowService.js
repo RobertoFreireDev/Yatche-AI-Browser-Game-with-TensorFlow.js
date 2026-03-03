@@ -12,6 +12,10 @@ class TensorflowService {
     return TensorflowService.instance
   }
 
+  addPendingSample(sample) {
+    this.pendingSamples.push(sample)
+  }
+
   async trainModel() {
     const model = tf.sequential()
 

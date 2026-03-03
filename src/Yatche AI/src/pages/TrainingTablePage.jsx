@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import DiceBoard from '../components/DiceBoard'
 import ScoreTable from '../components/ScoreTable'
 import { getInitialCategories } from '../constants/categories'
+import tensorflowService from '../services/tensorflowService'
 import { calculateCategoryScore, getTotalScore } from '../utils/scoring'
 
 const MAX_ROLLS = 3
@@ -12,8 +13,50 @@ function TrainingTablePage() {
   const [rollsLeft, setRollsLeft] = useState(MAX_ROLLS)
   const [categories, setCategories] = useState(getInitialCategories)
   const [finalScore, setFinalScore] = useState(null)
+  const categoryKeys = useMemo(() => Object.keys(getInitialCategories()), [])
 
   const totalScore = useMemo(() => getTotalScore(categories), [categories])
+
+  function mapHeldFlags(values) {
+    return values.map((value) => (value ? 1 : 0))
+  }
+
+  function mapChosenCategoryFlags(categoryValues) {
+    return categoryKeys.map((key) => (categoryValues[key] !== null ? 1 : 0))
+  }
+
+  function buildModelInput() {
+    return [
+      ...dices,
+      ...mapHeldFlags(held),
+      rollsLeft,
+      ...mapChosenCategoryFlags(categories),
+    ]
+  }
+
+  function normalizeInput(input) {
+    return input.map((value, index) => {
+      if (index < 5) return value / 6
+      if (index === 10) return value / MAX_ROLLS
+      return Math.max(0, Math.min(1, value))
+    })
+  }
+
+  function normalizeOutput(output) {
+    return output.map((value, index) => {
+      if (index === 5) return value / MAX_ROLLS
+      return Math.max(0, Math.min(1, value))
+    })
+  }
+
+  function pushPendingSample(output) {
+    const normalizedInput = normalizeInput(buildModelInput())
+    const normalizedOutput = normalizeOutput(output)
+    tensorflowService.addPendingSample({
+      input: normalizedInput,
+      output: normalizedOutput,
+    })
+  }
 
   function toggleHold(index) {
     if (rollsLeft === MAX_ROLLS) return
@@ -41,6 +84,12 @@ function TrainingTablePage() {
 
     if (rollsLeft === 0) return
 
+    pushPendingSample([
+      ...mapHeldFlags(held),
+      Math.max(rollsLeft - 1, 0),
+      ...new Array(categoryKeys.length).fill(0),
+    ])
+
     setDices((prevDice) =>
       prevDice.map((value, index) =>
         held[index] ? value : Math.floor(Math.random() * 6) + 1,
@@ -53,6 +102,12 @@ function TrainingTablePage() {
     if (MAX_ROLLS === rollsLeft) return
 
     if (categories[categoryKey] !== null) return
+
+    pushPendingSample([
+      0, 0, 0, 0, 0,
+      MAX_ROLLS,
+      ...categoryKeys.map((key) => (key === categoryKey ? 1 : 0)),
+    ])
 
     const score = calculateCategoryScore(categoryKey, dices)
     const nextCategories = { ...categories, [categoryKey]: score }
