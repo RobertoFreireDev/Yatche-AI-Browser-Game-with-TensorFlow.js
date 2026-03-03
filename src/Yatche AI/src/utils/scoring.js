@@ -36,7 +36,7 @@ export function calculateCategoryScore(category, dice) {
     case 'threeKind':
       return values.some((count) => count >= 3) ? sum : 0
     case 'fourKind':
-      return values.includes(4) ? sum : 0
+      return values.some((count) => count >= 4) ? sum : 0
     case 'fullHouse':
       return values.includes(3) && values.includes(2) ? 25 : 0
     case 'smallStraight':
