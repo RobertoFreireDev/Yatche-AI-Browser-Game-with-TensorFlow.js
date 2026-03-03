@@ -28,7 +28,27 @@ class TensorflowService {
     // 5 dice values (1,2,3,4,5,6)
     // 13 available categories (0 -> unavailable,1 -> available)
     // Total = 18 inputs
-    model.add(tf.layers.dense({ inputShape: [18], units: 128, activation: 'relu' }))
+    model.add(
+      tf.layers.dense({
+        inputShape: [18],
+        units: 96,
+        activation: 'relu',
+        kernelInitializer: 'heNormal',
+        kernelRegularizer: tf.regularizers.l2({ l2: 1e-4 }),
+      }),
+    )
+    model.add(tf.layers.batchNormalization())
+    model.add(tf.layers.dropout({ rate: 0.2 }))
+
+    model.add(
+      tf.layers.dense({
+        units: 48,
+        activation: 'relu',
+        kernelInitializer: 'heNormal',
+        kernelRegularizer: tf.regularizers.l2({ l2: 1e-4 }),
+      }),
+    )
+    model.add(tf.layers.dropout({ rate: 0.1 }))
 
     // Output layer
     // 13 categories (0-> don't chose,1 -> chose)
@@ -36,7 +56,7 @@ class TensorflowService {
     model.add(tf.layers.dense({ units: 13, activation: 'softmax' }))
 
     model.compile({
-      optimizer: 'adam',
+      optimizer: tf.train.adam(0.0007),
       loss: 'categoricalCrossentropy',
       metrics: ['accuracy'],
     })
